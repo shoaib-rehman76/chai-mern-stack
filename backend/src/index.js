@@ -4,6 +4,7 @@ import connectDB from './db/db.js';
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 
+const app = express()
 const options = {
     origin: process.env.ORIGIN || '*',
     credentials: true,
@@ -17,7 +18,6 @@ app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true })) // for understanding the url query params as well [extended] for understanding deep nested objects
 app.use(express.static('public'))
 
-const app = express()
 const PORT = process.env.PORT;
 
 
