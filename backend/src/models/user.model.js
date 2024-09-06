@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 
 
 const userSchema = new Schema({
-    username: {
+    userName: {
         type: String,
         required: ['user name is required', true],
         unique: true,
@@ -51,7 +51,7 @@ const userSchema = new Schema({
 userSchema.pre('save', async function (next) {
     const user = this
     if (!user.isModified('password')) return next();
-    this.password = bcrypt.hash(user.password, 10)
+    this.password = await bcrypt.hash(user.password, 10)
     next()
 })
 
@@ -70,7 +70,5 @@ userSchema.methods.generateAccessToken = async function () {
     const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY })
     return token;
 }
-
-
 
 export const User = mongoose.model('User', userSchema)
