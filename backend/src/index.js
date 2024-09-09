@@ -3,6 +3,8 @@ import dotenv from 'dotenv'
 import connectDB from './db/db.js';
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import morgan from 'morgan'
+dotenv.config({ path: './.env' })
 
 const app = express()
 const options = {
@@ -10,9 +12,9 @@ const options = {
     credentials: true,
 }
 
-dotenv.config({ path: './.env' })
-
+app.use(morgan('dev'))
 app.use(cors(options))
+app.use(express.json())
 app.use(cookieParser())
 app.use(express.json({ limit: "16kb" }))
 app.use(urlencoded({ extended: true })) // for understanding the url query params as well [extended] for understanding deep nested objects

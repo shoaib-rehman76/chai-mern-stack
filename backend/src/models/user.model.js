@@ -4,6 +4,12 @@ import jwt from 'jsonwebtoken'
 
 
 const userSchema = new Schema({
+    userId: {
+        type: Number,
+        required: true,
+        unique: true,
+        default: 0
+    },
     userName: {
         type: String,
         required: ['user name is required', true],
@@ -57,18 +63,39 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.comparePassword = async function (userPasssword) {
     const user = this;
+
+    if (!userPasssword) {
+        console.log('user password mismatch');
+    }
     const isMatched = await bcrypt.compare(userPasssword, user.password)
     return isMatched
 
 }
 
 userSchema.methods.generateAccessToken = async function () {
+    console.log(typeof process.env.ACCESS_TOKEN_EXPIRY, 'token');
+
     const user = this;
     const payload = {
         _id: user._id,
     }
-    const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY })
+    const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
     return token;
+}
+
+userSchema.methods.generateRefreshToken = function () {
+    console.log(typeof process.env.REFRESH_TOKEN_SECRET, 'token');
+
+    return jwt.sign(
+        {
+            id: this._id,
+
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
 }
 
 export const User = mongoose.model('User', userSchema)
